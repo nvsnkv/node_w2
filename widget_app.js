@@ -14,10 +14,14 @@ var config = {
 
 var redis = require('redis');
 var express = require('express');
+var forecast = require('./forecast.js');
+
+var client = redis.createClient(config.redis.port);
 var listener = express();
 
-listener.get('/w2/:city/:foresight', function(req, res){
-
+listener.get('/w2/:city/:length', function(req, res){
+    var forecast = forecast();
+    forecast.getWeather("Moscow",1,function(data){ res.send(JSON.stringify(data)); });
 });
 
 listener.get('/', function(req, res){ res.send("w2 host."); });
