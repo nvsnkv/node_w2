@@ -13,26 +13,27 @@ OpenWeatherProvider.prototype = {
     attempts: 5,
 
     getWeather: function (city,duration,callback) {
-        var url = apiEntryPoint + setCity(city) + setDuration(duration) + apiArguments;
-        attempts = maxAttempts;
+        var url = this.apiEntryPoint + this.setCity(city) + this.setDuration(duration) + this.apiArguments;
+        this.maxAttempts;
 
-        var _getResponse = getResponse.bind(this);
-        _getResponse(url,_getResponse,callback);
+        var _getResponse = this.getResponse.bind(this);
+        _getResponse(url,_getResponse, this.maxAttempts, callback);
     },
-    getResponse: function(url, self, callback) {
-        attepmts--;
-        if (attepmts > 0)
+    getResponse: function(url, self, attempt, callback) {
+        attepmt--;
+        if (attepmt > 0)
         {
-            request(url,function(err,response, body) {
+            request(url,(function(err,response, body) {
                 if (response.statusCode == 200)
-                    callback(createWeatherInfo(url,body));
+                    callback(this.createWeatherInfo(url, body));
                 else
-                    self(url,self,callback);
-            });
+                    self(url, self, attepmt, callback);
+            }).bind(this));
         }
         else
-            callback(url,createWeatherInfo(url,null));
+            callback(url, this.createWeatherInfo(url,null));
     },
+
     createWeatherInfo: function(url,data) {
         return {url: url, weather:data, timestamp: new Date()};
     },
@@ -45,7 +46,4 @@ OpenWeatherProvider.prototype = {
     }
 };
 
-
-module.exports = function() {
-    return new OpenWeatherProvider();
-};
+exports.OpenWeatherProvider = OpenWeatherProvider;
