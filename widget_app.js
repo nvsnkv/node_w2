@@ -20,8 +20,10 @@ var client = redis.createClient(config.redis.port);
 var listener = express();
 
 listener.get('/w2/:city/:length', function(req, res){
+    var options = new forecast.Options(req.params);
+
     var fc = new forecast.OpenWeatherProvider();
-    fc.getWeather("Moscow",1,function(data){ res.send(JSON.stringify(data)); });
+    fc.getWeather(options.city, options.duration, function(data){ res.send(JSON.stringify(data)); });
 });
 
 listener.listen(config.server.port);

@@ -1,5 +1,17 @@
 var request = require('request');
 
+function Options(params) {
+    const cities = {
+        "nnov": "Nizhni Novgorod",
+        "msk": "Moscow",
+        "spb": "St. Petersburg"
+    };
+
+    this.city = cities[params.city];
+    this.duration = params.duration;
+}
+
+
 function OpenWeatherProvider(attempts) {
     if (!isNaN(attempts))
         this.maxAttempts = attempts;
@@ -46,3 +58,4 @@ OpenWeatherProvider.prototype = {
 };
 
 exports.OpenWeatherProvider = OpenWeatherProvider;
+exports.Options = Options;
