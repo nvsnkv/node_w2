@@ -75,7 +75,7 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
     function updateValue(url, callback) {
         self.getWeather(city, duration, function(weather){
             var result = weather;
-            self.client.set(url, result, function (err, reply) {
+            self.client.set(url, JSON.stringify(result), function (err, reply) {
                 callback(result);
             })
         });
@@ -92,9 +92,11 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
 
     }
 
-    self.client.get(url, function (err, data) {
-        if (data)
-            checkFreshness(data, callback);
+    self.client.exists(url, function (err, reply) {
+        if (reply)
+            self.client.get(url, function(err, data){
+                checkFreshness(data, callback);
+            });
         else
             updateValue(url, callback);
 
