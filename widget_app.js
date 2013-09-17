@@ -22,8 +22,9 @@ var listener = express();
 listener.get('/w2/:city/:length', function(req, res){
     var options = new forecast.Options(req.params);
 
-    var fc = new forecast.OpenWeatherProvider();
-    fc.getWeather(options.city, options.duration, function(data){ res.send(JSON.stringify(data)); });
+    const oneDay = 86400000;
+    var fc = new forecast.CachedWeatherProvider(client, oneDay);
+    fc.getCachedWeather(options.city, options.duration, function(data){ res.send(JSON.stringify(data)); });
 });
 
 listener.listen(config.server.port);

@@ -1,5 +1,9 @@
 var request = require('request');
 
+function createWeatherInfo(url, data) {
+    return {url: url, weather: data, timestamp: new Date()};
+}
+
 function Options(params) {
     const cities = {
         "nnov": "Nizhni Novgorod",
@@ -24,21 +28,17 @@ OpenWeatherProvider.prototype = {
     maxAttempts: 5,
     attempts: 5,
 
-    getWeather: function (city,duration,callback) {
-        var url = this.apiEntryPoint + this.setCity(city) + this.setDuration(duration) + this.apiArguments;
+    getWeather: function (city, duration, callback) {
+        var url = this.getUrl(city, duration);
 
-        var _getResponse = this.getResponse.bind(this);
-        _getResponse(url,_getResponse, this.maxAttempts, callback);
+        var _getResponse = this.getResponse;
+        _getResponse(url, _getResponse, this.maxAttempts, callback);
     },
-    getResponse: function(url, self, attempt, callback) {
+    getResponse: function (url, self, attempt, callback) {
         attempt--;
 
-        function createWeatherInfo(url,data) {
-            return {url: url, weather:data, timestamp: new Date()};
-        }
-        if (attempt > 0)
-        {
-            request.get(url, null, function(err,response, body) {
+        if (attempt > 0) {
+            request.get(url, null, function (err, response, body) {
                 if (response.statusCode == 200)
                     callback(createWeatherInfo(url, body));
                 else
@@ -46,16 +46,61 @@ OpenWeatherProvider.prototype = {
             });
         }
         else
-            callback(url, this.createWeatherInfo(url,null));
+            callback(url, this.createWeatherInfo(url, null));
     },
 
-    setCity: function(city) {
+    getUrl: function (city, duration) {
+        return this.apiEntryPoint + this.setCity(city) + this.setDuration(duration) + this.apiArguments;
+    },
+    setCity: function (city) {
         return "?q=" + encodeURIComponent(city);
     },
-    setDuration: function(duration) {
+    setDuration: function (duration) {
         return "&cnt=" + duration;
     }
 };
 
+function CachedWeatherProvider(client, cachingTime) {
+    this.client = client;
+    this.cachingTime = cachingTime;
+}
+
+CachedWeatherProvider.prototype = OpenWeatherProvider.prototype;
+CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, callback) {
+    var self = this;
+
+    var url = self.getUrl(city, duration);
+    var cachingTime = self.cachingTime;
+
+    function updateValue(url, callback) {
+        self.getWeather(city, duration, function(weather){
+            var result = weather;
+            self.client.set(url, result, function (err, reply) {
+                callback(result);
+            })
+        });
+    }
+
+    function checkFreshness(data, callback) {
+        var result = JSON.parse(data);
+        var date = new Date();
+
+        if (date - result.timestamp < cachingTime)
+            callback(result);
+        else
+            updateValue(url, callback);
+
+    }
+
+    self.client.get(url, function (err, data) {
+        if (data)
+            checkFreshness(data, callback);
+        else
+            updateValue(url, callback);
+
+    });
+};
+
 exports.OpenWeatherProvider = OpenWeatherProvider;
+exports.CachedWeatherProvider = CachedWeatherProvider;
 exports.Options = Options;
