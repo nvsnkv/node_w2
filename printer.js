@@ -7,6 +7,10 @@ Printer.prototype = {
         this.print('./templates/error.html', error, cb);
     },
 
+    printWeather: function(weather, cb) {
+        this.print('./templates/widget_iframe.html',weather,cb);
+    },
+
     print: function (template, view, cb) {
         var output = "";
         var stream = mu.compileAndRender(template, view);
@@ -19,6 +23,4 @@ Printer.prototype = {
     }
 };
 
-module.exports = function () {
-    return new Printer();
-};
+exports.Printer = Printer;

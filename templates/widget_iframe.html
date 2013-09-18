@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>simple weather widget</title>
+    </head>
+    <body>
+    <div class="w2_widget">
+        <h2>{{city.name}}</h2>
+        <div id="weather"></div>
+        <table>
+        {{#list}}
+            <tr>
+                <td></td>
+                <td>day</td>
+                <td>min</td>
+                <td>max</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>{{temp.day}}</td>
+                <td>{{temp.min}}</td>
+                <td>{{temp.max}}</td>
+            </tr>
+        {{/list}}
+        </table>
+    </div>
+    </body>
+</html>

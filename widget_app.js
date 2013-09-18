@@ -15,17 +15,21 @@ var config = {
 var redis = require('redis');
 var express = require('express');
 var forecast = require('./forecast.js');
+var printFactory = require('./printer.js');
 
 var client = redis.createClient(config.redis.port);
 var listener = express();
 
-listener.get('/w2/:city/:length', function (req, res) {
+listener.get('/w2/:city/:duration', function (req, res) {
     var options = new forecast.Options(req.params);
 
     const oneDay = 86400000;
     var fc = new forecast.CachedWeatherProvider(client, oneDay);
     fc.getCachedWeather(options.city, options.duration, function (data) {
-        res.send(JSON.stringify(data));
+        var printer = new printFactory.Printer();
+        printer.printWeather(data.weather, function(output) {
+            res.send(output);
+        });
     });
 });
 

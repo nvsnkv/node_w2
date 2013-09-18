@@ -90,6 +90,8 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
     function updateValue(callback) {
         self.getWeather(city, duration, function (weather) {
             var result = weather;
+            result.weather = JSON.parse(result.weather);
+
             self.client.set(url.hashCode(), JSON.stringify(result), function (err, reply) {
                 callback(result);
             })
