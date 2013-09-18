@@ -11,6 +11,10 @@ Printer.prototype = {
         this.print('./templates/widget_iframe.html',weather,cb);
     },
 
+    printWeatherVertical: function(weather, cb) {
+        this.print('./templates/widget_iframe_vertical.html',weather,cb);
+    },
+
     print: function (template, view, cb) {
         var output = "";
         var stream = mu.compileAndRender(template, view);

@@ -37,6 +37,18 @@ listener.get('/w2/:city/:duration', function (req, res) {
     });
 });
 
+listener.get('/w2/:city/:duration/vertical', function (req, res) {
+    var options = new forecast.Options(req.params);
+
+    var fc = new forecast.CachedWeatherProvider(client, config.cache.ttl);
+    fc.getCachedWeather(options.city, options.duration, function (data) {
+        var printer = new printFactory.Printer();
+        printer.printWeatherVertical(data.weather, function(output) {
+            res.send(output);
+        });
+    });
+});
+
 listener.get("/w2/style.css", function(req, res){
     res.send(fs.readFileSync('./css/style.css'));
 })
