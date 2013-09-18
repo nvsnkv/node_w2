@@ -1,7 +1,17 @@
 var request = require('request');
 
 function createWeatherInfo(url, data) {
-    return {url: url, weather: data, timestamp: new Date()};
+    var result = {url: url, weather: data, timestamp: new Date()};
+
+    result.weather = JSON.parse(result.weather);
+    for (var i=0; i<result.weather.list.length; i++)
+    {
+        var date = new Date();
+        date.setDate(date.getDate() + i);
+        result.weather.list[i].date = date.toDateString();
+    }
+
+    return result;
 }
 
 String.prototype.hashCode = function () {
@@ -90,7 +100,6 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
     function updateValue(callback) {
         self.getWeather(city, duration, function (weather) {
             var result = weather;
-            result.weather = JSON.parse(result.weather);
 
             self.client.set(url.hashCode(), JSON.stringify(result), function (err, reply) {
                 callback(result);
