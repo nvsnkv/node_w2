@@ -1,19 +1,24 @@
 var mu = require('mu2');
 
-function Printer () {}
+function Printer() {
+}
 Printer.prototype = {
-    printError : function(error,cb) {
-        this.print('./templates/error.html',error, cb);
+    printError: function (error, cb) {
+        this.print('./templates/error.html', error, cb);
     },
 
-    print: function(template,view,cb) {
+    print: function (template, view, cb) {
         var output = "";
         var stream = mu.compileAndRender(template, view);
-        stream.on('data', function(data) { output += data.toString(); });
-        stream.on('end', function() {cb(output); });
+        stream.on('data', function (data) {
+            output += data.toString();
+        });
+        stream.on('end', function () {
+            cb(output);
+        });
     }
 };
 
-module.exports = function() {
+module.exports = function () {
     return new Printer();
 };

@@ -4,13 +4,13 @@ function createWeatherInfo(url, data) {
     return {url: url, weather: data, timestamp: new Date()};
 }
 
-String.prototype.hashCode = function(){
+String.prototype.hashCode = function () {
     if (this._hashCode === undefined) {
         var hash = 0;
         if (this.length == 0) return hash;
         for (i = 0; i < this.length; i++) {
             var char = this.charCodeAt(i);
-            hash = ((hash<<5)-hash)+char;
+            hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32bit integer
         }
         this._hashCode = hash;
@@ -88,7 +88,7 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
     var cachingTime = self.cachingTime;
 
     function updateValue(callback) {
-        self.getWeather(city, duration, function(weather){
+        self.getWeather(city, duration, function (weather) {
             var result = weather;
             self.client.set(url.hashCode(), JSON.stringify(result), function (err, reply) {
                 callback(result);
@@ -109,7 +109,7 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
 
     self.client.exists(url.hashCode(), function (err, reply) {
         if (reply)
-            self.client.get(url.hashCode(), function(err, data){
+            self.client.get(url.hashCode(), function (err, data) {
                 checkFreshness(data, callback);
             });
         else
