@@ -4,6 +4,21 @@ function createWeatherInfo(url, data) {
     return {url: url, weather: data, timestamp: new Date()};
 }
 
+String.prototype.hashCode = function(){
+    if (this._hashCode === undefined) {
+        var hash = 0;
+        if (this.length == 0) return hash;
+        for (i = 0; i < this.length; i++) {
+            var char = this.charCodeAt(i);
+            hash = ((hash<<5)-hash)+char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        this._hashCode = hash;
+    }
+    return this._hashCode;
+};
+
+
 function Options(params) {
     const cities = {
         "nnov": "Nizhni Novgorod",
@@ -72,10 +87,10 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
     var url = self.getUrl(city, duration);
     var cachingTime = self.cachingTime;
 
-    function updateValue(url, callback) {
+    function updateValue(callback) {
         self.getWeather(city, duration, function(weather){
             var result = weather;
-            self.client.set(url, JSON.stringify(result), function (err, reply) {
+            self.client.set(url.hashCode(), JSON.stringify(result), function (err, reply) {
                 callback(result);
             })
         });
@@ -85,20 +100,20 @@ CachedWeatherProvider.prototype.getCachedWeather = function (city, duration, cal
         var result = JSON.parse(data);
         var date = new Date();
 
-        if (date - result.timestamp < cachingTime)
+        if ((date - Date.parse(result.timestamp)) < cachingTime)
             callback(result);
         else
-            updateValue(url, callback);
+            updateValue(callback);
 
     }
 
-    self.client.exists(url, function (err, reply) {
+    self.client.exists(url.hashCode(), function (err, reply) {
         if (reply)
-            self.client.get(url, function(err, data){
+            self.client.get(url.hashCode(), function(err, data){
                 checkFreshness(data, callback);
             });
         else
-            updateValue(url, callback);
+            updateValue(callback);
 
     });
 };
