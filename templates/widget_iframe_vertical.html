@@ -8,7 +8,7 @@
         <h3>{{city.name}}</h3>
         <div id="weather">
         {{#list}}
-            <div class="pull-left text-left" style="margin: 0 2px">
+            <div class="text-left" style="margin: 0 2px">
                 <p class="date">{{date}}</p>
                 <p class="temp_main">{{temp.day}} &#x2103;</p>
                 <p class="text">
@@ -18,7 +18,9 @@
         {{/list}}
             <div style="clear: both"></div>
         </div>
-        <p class="muted">powered by <a href="http://openweathermap.org/">openweathermap.org</a></p>
+        <p class="muted">powered by <br />
+            <a href="http://openweathermap.org/">openweathermap.org</a>
+        </p>
     </div>
     </body>
 </html>

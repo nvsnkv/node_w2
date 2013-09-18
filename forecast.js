@@ -9,6 +9,8 @@ function createWeatherInfo(url, data) {
         var date = new Date();
         date.setDate(date.getDate() + i);
         result.weather.list[i].date = date.toDateString();
+
+        result.weather.list[i].weather = result.weather.list[i].weather[0];
     }
 
     return result;

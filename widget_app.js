@@ -1,6 +1,6 @@
 var argv = require('optimist')
-    .usage('--port {application port}, --redis_port {db port}')
-    .demand(['port', 'redis_port'])
+    .usage('--port {application port}, --redis_port {db port} --cache_ttl {milliseconds}')
+    .demand(['port', 'redis_port', 'cache_ttl'])
     .argv;
 
 var config = {
@@ -9,9 +9,14 @@ var config = {
     },
     redis: {
         port: argv.redis_port
+    },
+
+    cache: {
+        ttl: argv.cache_ttl
     }
 };
 
+var fs = require('fs');
 var redis = require('redis');
 var express = require('express');
 var forecast = require('./forecast.js');
@@ -23,8 +28,7 @@ var listener = express();
 listener.get('/w2/:city/:duration', function (req, res) {
     var options = new forecast.Options(req.params);
 
-    const oneDay = 86400000;
-    var fc = new forecast.CachedWeatherProvider(client, oneDay);
+    var fc = new forecast.CachedWeatherProvider(client, config.cache.ttl);
     fc.getCachedWeather(options.city, options.duration, function (data) {
         var printer = new printFactory.Printer();
         printer.printWeather(data.weather, function(output) {
@@ -32,5 +36,9 @@ listener.get('/w2/:city/:duration', function (req, res) {
         });
     });
 });
+
+listener.get("/w2/style.css", function(req, res){
+    res.send(fs.readFileSync('./css/style.css'));
+})
 
 listener.listen(config.server.port);
